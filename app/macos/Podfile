@@ -1,0 +1,62 @@
+platform :osx, '13.3'
+
+# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'ephemeral', 'Flutter-Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure \"flutter pub get\" is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Flutter-Generated.xcconfig, then run \"flutter pub get\""
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_macos_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+
+  flutter_install_all_macos_pods File.dirname(File.realpath(__FILE__))
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_macos_build_settings(target)
+  end
+  # audio.cpp 引擎为 arm64 预编译（audiocpp-ffi 链接静态库），排除 x86_64
+  # ——否则 Release 的 universal ARCHS 会让 cargokit 按 x86_64 重链并失败
+  installer.pods_project.build_configurations.each do |config|
+    config.build_settings['EXCLUDED_ARCHS[sdk=macosx*]'] = 'x86_64'
+  end
+  # Xcode 把 libasr_bridge.a 链成 framework 时需要显式声明引擎的系统框架
+  #（cblas/vDSP 在 Accelerate 里；Debug 曾因此 Undefined symbols 失败），
+  # 以及 sherpa-onnx 分离库（Rust staticlib 不携带 dylib 依赖）。
+  installer.pods_project.targets.each do |target|
+    next unless target.name == 'asr_bridge'
+    target.build_configurations.each do |config|
+      flags = [
+        '$(inherited)',
+        '-framework Metal -framework Foundation -framework Accelerate -framework CoreGraphics',
+        '-L$(SRCROOT)/../../../rust/vendor/sherpa-onnx/lib -lsherpa-onnx-c-api',
+      ].join(' ')
+      existing = config.build_settings['OTHER_LDFLAGS']
+      config.build_settings['OTHER_LDFLAGS'] = existing ? "#{existing} #{flags}" : flags
+    end
+  end
+end
