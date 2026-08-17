@@ -1,0 +1,14 @@
+[package]
+name = "sherpa-ffi"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# sherpa-onnx 说话人分离 FFI（pyannote 分割 + CAM++ 声纹 + 快速聚类，
+# 全 ONNX/CPU）。构建依赖预编译共享库（scripts/fetch-sherpa-onnx.sh），
+# 缺省编译为桩（运行期报清晰错误），与 audiocpp-ffi 的约定一致。
+
+[dependencies]
+
+[build-dependencies]
+cc = "1"
