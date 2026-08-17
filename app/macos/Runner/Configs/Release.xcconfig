@@ -1,0 +1,10 @@
+#include? "../Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
+#include "../../Flutter/Flutter-Release.xcconfig"
+#include "Warnings.xcconfig"
+
+// Xcode 26 Swift 显式模块预编译对 pods 的 -Swift.h 会误报 unsupported Swift architecture
+SWIFT_ENABLE_EXPLICIT_MODULES = NO
+CLANG_ENABLE_EXPLICIT_MODULES = NO
+
+// 引擎与 pods 均为 arm64 预编译：排除 x86_64（Release 的 universal ARCHS 会按 x86_64 编译 Runner）
+EXCLUDED_ARCHS[sdk=macosx*] = x86_64
