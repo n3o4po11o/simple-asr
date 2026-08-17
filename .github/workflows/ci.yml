@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Flutter 版本 pin 在当前开发所用版本（与本地一致）；不 pin 会随 stable 漂移
+# （2026-08 实测：stable 3.47 的 analyzer 使 flutter analyze 退出非零）。
+env:
+  FLUTTER_VERSION: 3.44.8
+
+jobs:
+  rust:
+    name: Rust 单测（asr-core / 对齐逻辑）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+      - name: asr-core 测试
+        working-directory: rust
+        run: cargo test -p asr-core
+
+  dart:
+    name: Flutter 测试（状态机 / 校准视图 / diff）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: 依赖
+        working-directory: app
+        run: flutter pub get
+      - name: 静态分析
+        working-directory: app
+        run: flutter analyze --no-pub
+      - name: 测试
+        working-directory: app
+        run: flutter test
