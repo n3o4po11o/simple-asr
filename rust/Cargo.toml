@@ -1,0 +1,23 @@
+[workspace]
+resolver = "2"
+# candle vendor 有自己的 workspace（candle-core 继承其 description 等），须排除
+members = [
+    "crates/asr-core",
+    "crates/engine-smoke",
+    "crates/audiocpp-ffi",
+    "crates/sherpa-ffi",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[workspace.dependencies]
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+
+[profile.release]
+lto = "thin"
