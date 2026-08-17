@@ -1,0 +1,27 @@
+[package]
+name = "asr_bridge"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+# audio.cpp FFI（macOS 无引擎树时链接桩，运行期报清晰错误）
+audiocpp-ffi = { path = "../../rust/crates/audiocpp-ffi" }
+# sherpa-onnx 说话人分离（缺预编译库时链接桩）
+sherpa-ffi = { path = "../../rust/crates/sherpa-ffi" }
+flutter_rust_bridge = "=2.12.0"
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sysinfo = "0.33"
+asr-core = { path = "../../rust/crates/asr-core" }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+# GPU 信息展示用（audiocpp 引擎自行择卡）
+objc2-metal = { version = "0.3", features = ["MTLDevice"] }
+
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }

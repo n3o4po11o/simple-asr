@@ -1,0 +1,12 @@
+[package]
+name = "engine-smoke"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+asr-core = { path = "../asr-core" }
+audiocpp-ffi = { path = "../audiocpp-ffi" }
+sherpa-ffi = { path = "../sherpa-ffi" }
+env_logger = "0.11"
+symphonia = { version = "0.5", default-features = false, features = ["wav", "pcm", "mp3", "aac", "isomp4", "flac", "ogg", "vorbis", "adpcm", "aiff", "caf"] }
