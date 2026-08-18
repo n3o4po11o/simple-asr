@@ -1,0 +1,13 @@
+[package]
+name = "audiocpp-ffi"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+build = "build.rs"
+links = "audiocpp_c"
+
+[dependencies]
+serde_json = "1"
+
+[build-dependencies]
+cc = "1"

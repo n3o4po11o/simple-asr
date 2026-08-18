@@ -1,0 +1,44 @@
+# vendor
+vendor/llama.cpp/
+
+# rust
+rust/target/
+app/rust/target/
+**/*.rs.bk
+
+# cocoapods（Podfile/lock 入库，Pods/ 不入）
+app/macos/Pods/
+
+# linux 构建（远程容器产物）
+dist/
+.flutter-sdk/
+.tools/
+.cargo-home/
+
+# flutter / dart
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/build/
+app/macos/Flutter/ephemeral/
+app/linux/flutter/ephemeral/
+app/windows/flutter/ephemeral/
+
+# downloads & misc
+*.part
+.DS_Store
+.idea/
+*.iml
+
+# audio.cpp 引擎源码（audiocpp-ffi 用；scripts/fetch-audiocpp.sh 拉取）
+rust/vendor/audiocpp/
+
+# sherpa-onnx 预编译库（sherpa-ffi 用；scripts/fetch-sherpa-onnx.sh 拉取）
+rust/vendor/sherpa-onnx/
+rust/vendor/bundled-models/
+
+# zcode 会话工件
+.zcode/
+
+# Xcode 本地构建日志（曾在 ignore 前被跟踪）
+app/macos/build/
